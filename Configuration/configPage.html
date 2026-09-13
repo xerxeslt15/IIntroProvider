@@ -1,61 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>DSK Intro Player</title>
-</head>
-<body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
-        <div data-role="content">
-            <div class="content-primary">
-                <form id="DskIntroPlayerConfigForm">
+<div data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="DskIntroPlayerConfigForm">
 
-                    <div class="verticalSection">
-                        <h1>DSK Intro Player</h1>
-                        <p>Spielt ein eigenes Intro-Video vor Filmen (und optional Serienepisoden) in den ausgewählten Bibliotheken ab.</p>
+                <div class="verticalSection">
+                    <h1>DSK Intro Player</h1>
+                    <p>Spielt ein eigenes Intro-Video vor Filmen (und optional Serienepisoden) in den ausgewählten Bibliotheken ab.</p>
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="txtIntroFilePath">Pfad zur Intro-Videodatei (auf dem Server)</label>
+                    <input is="emby-input" type="text" id="txtIntroFilePath" name="txtIntroFilePath" />
+                    <div class="fieldDescription">
+                        Vollständiger Pfad auf dem Emby-Server, z. B. /volume1/Media/Intro/intro.mp4 (unter Windows z. B. C:\Intro\intro.mp4).
+                        Die Datei muss vom Emby-Server-Dienst lesbar sein.
                     </div>
+                </div>
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="txtIntroFilePath">Pfad zur Intro-Videodatei (auf dem Server)</label>
-                        <input is="emby-input" type="text" id="txtIntroFilePath" name="txtIntroFilePath" />
-                        <div class="fieldDescription">
-                            Vollständiger Pfad auf dem Emby-Server, z. B. /volume1/Media/Intro/intro.mp4 (unter Windows z. B. C:\Intro\intro.mp4).
-                            Die Datei muss vom Emby-Server-Dienst lesbar sein.
-                        </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="txtLibraryNames">Bibliotheken (Namen, durch Komma getrennt)</label>
+                    <input is="emby-input" type="text" id="txtLibraryNames" name="txtLibraryNames" />
+                    <div class="fieldDescription">
+                        Genaue Namen der Bibliotheken, in denen das Intro laufen soll, z. B. "Filme, Serien" (Gross-/Kleinschreibung egal).
+                        Leer lassen = Intro komplett deaktiviert.
                     </div>
+                </div>
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="txtLibraryNames">Bibliotheken (Namen, durch Komma getrennt)</label>
-                        <input is="emby-input" type="text" id="txtLibraryNames" name="txtLibraryNames" />
-                        <div class="fieldDescription">
-                            Genaue Namen der Bibliotheken, in denen das Intro laufen soll, z. B. "Filme, Serien" (Gross-/Kleinschreibung egal).
-                            Leer lassen = Intro komplett deaktiviert.
-                        </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input is="emby-checkbox" type="checkbox" id="chkIncludeEpisodes" />
+                        <span>Intro auch vor Serienepisoden abspielen</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">
+                        Wenn deaktiviert, laeuft das Intro nur vor Filmen.
                     </div>
+                </div>
 
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label>
-                            <input is="emby-checkbox" type="checkbox" id="chkIncludeEpisodes" />
-                            <span>Intro auch vor Serienepisoden abspielen</span>
-                        </label>
-                        <div class="fieldDescription checkboxFieldDescription">
-                            Wenn deaktiviert, laeuft das Intro nur vor Filmen.
-                        </div>
-                    </div>
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Speichern</span>
+                    </button>
+                </div>
 
-                    <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block">
-                            <span>Speichern</span>
-                        </button>
-                    </div>
-
-                </form>
-            </div>
+            </form>
         </div>
     </div>
-    <script type="text/javascript">
+</div>
+<script type="text/javascript">
+    (function () {
         var DskIntroPluginId = "7d3f6a1b-9c2e-4d5a-8b7f-1e2c3d4a5b6c";
 
-        document.querySelector('.pluginConfigurationPage').addEventListener('pageshow', function () {
+        var pageEl = document.querySelector('.pluginConfigurationPage');
+
+        pageEl.addEventListener('pageshow', function () {
             Dashboard.showLoadingMsg();
             var page = this;
 
@@ -69,7 +66,7 @@
             });
         });
 
-        document.querySelector('#DskIntroPlayerConfigForm').addEventListener('submit', function (e) {
+        pageEl.querySelector('#DskIntroPlayerConfigForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             var page = this.closest('.pluginConfigurationPage');
@@ -91,6 +88,5 @@
 
             return false;
         });
-    </script>
-</body>
-</html>
+    })();
+</script>
