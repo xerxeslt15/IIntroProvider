@@ -17,3 +17,15 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Wiederherstellen
+        run: dotnet restore DskIntroPlayer.csproj
+
+      - name: Bauen
+        run: dotnet build DskIntroPlayer.csproj -c Release -o build_output
+
+      - name: DLL hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: DskIntroPlayer
+          path: build_output/DskIntroPlayer.dll
