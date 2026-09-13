@@ -23,20 +23,23 @@
                         </div>
                     </div>
 
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="txtLibraryNames">Bibliotheken (Namen, durch Komma getrennt)</label>
+                        <input is="emby-input" type="text" id="txtLibraryNames" name="txtLibraryNames" />
+                        <div class="fieldDescription">
+                            Genaue Namen der Bibliotheken, in denen das Intro laufen soll, z. B. "Filme, Serien" (Gross-/Kleinschreibung egal).
+                            Leer lassen = Intro komplett deaktiviert.
+                        </div>
+                    </div>
+
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input is="emby-checkbox" type="checkbox" id="chkIncludeEpisodes" />
                             <span>Intro auch vor Serienepisoden abspielen</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">
-                            Wenn deaktiviert, läuft das Intro nur vor Filmen.
+                            Wenn deaktiviert, laeuft das Intro nur vor Filmen.
                         </div>
-                    </div>
-
-                    <div class="verticalSection">
-                        <h2>Bibliotheken</h2>
-                        <p>Wähle aus, in welchen Bibliotheken das Intro abgespielt werden soll. Ohne Auswahl bleibt das Intro deaktiviert.</p>
-                        <div id="libraryList"></div>
                     </div>
 
                     <div>
@@ -52,42 +55,16 @@
     <script type="text/javascript">
         var DskIntroPluginId = "7d3f6a1b-9c2e-4d5a-8b7f-1e2c3d4a5b6c";
 
-        function loadLibraries(page, enabledIds) {
-            ApiClient.getVirtualFolders().then(function (folders) {
-                var container = page.querySelector('#libraryList');
-                var html = '';
-
-                folders.forEach(function (folder) {
-                    var id = folder.ItemId;
-                    var checked = enabledIds.indexOf(id) !== -1 ? ' checked' : '';
-
-                    html += '<div class="checkboxContainer">';
-                    html += '<label>';
-                    html += '<input is="emby-checkbox" type="checkbox" class="chkLibrary" data-libraryid="' + id + '"' + checked + ' />';
-                    html += '<span>' + folder.Name + '</span>';
-                    html += '</label>';
-                    html += '</div>';
-                });
-
-                container.innerHTML = html || '<p>Keine Bibliotheken gefunden.</p>';
-            });
-        }
-
         document.querySelector('.pluginConfigurationPage').addEventListener('pageshow', function () {
             Dashboard.showLoadingMsg();
             var page = this;
 
             ApiClient.getPluginConfiguration(DskIntroPluginId).then(function (config) {
                 page.querySelector('#txtIntroFilePath').value = config.IntroFilePath || '';
+                page.querySelector('#txtLibraryNames').value = config.EnabledLibraryNames || '';
                 page.querySelector('#chkIncludeEpisodes').checked = config.IncludeEpisodes || false;
-
-                var enabledIds = (config.EnabledLibraryIds || '')
-                    .split(',')
-                    .map(function (s) { return s.trim(); })
-                    .filter(function (s) { return s.length > 0; });
-
-                loadLibraries(page, enabledIds);
-
+                Dashboard.hideLoadingMsg();
+            }, function () {
                 Dashboard.hideLoadingMsg();
             });
         });
@@ -100,18 +77,16 @@
 
             ApiClient.getPluginConfiguration(DskIntroPluginId).then(function (config) {
                 config.IntroFilePath = page.querySelector('#txtIntroFilePath').value;
+                config.EnabledLibraryNames = page.querySelector('#txtLibraryNames').value;
                 config.IncludeEpisodes = page.querySelector('#chkIncludeEpisodes').checked;
-
-                var checkedBoxes = page.querySelectorAll('.chkLibrary:checked');
-                var ids = [];
-                checkedBoxes.forEach(function (box) {
-                    ids.push(box.getAttribute('data-libraryid'));
-                });
-                config.EnabledLibraryIds = ids.join(',');
 
                 ApiClient.updatePluginConfiguration(DskIntroPluginId, config).then(function (result) {
                     Dashboard.processPluginConfigurationUpdateResult(result);
+                }, function () {
+                    Dashboard.hideLoadingMsg();
                 });
+            }, function () {
+                Dashboard.hideLoadingMsg();
             });
 
             return false;

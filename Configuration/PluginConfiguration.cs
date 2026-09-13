@@ -14,12 +14,11 @@ namespace DskIntroPlayer.Configuration
         public string IntroFilePath { get; set; } = string.Empty;
 
         /// <summary>
-        /// Kommagetrennte Liste der Bibliotheks-IDs (Virtual Folder Ids),
-        /// für die das Intro abgespielt werden soll.
-        /// Leer = für keine Bibliothek aktiv (Intro ist deaktiviert),
-        /// bis mindestens eine Bibliothek in den Plugin-Einstellungen ausgewählt wurde.
+        /// Kommagetrennte Liste der Bibliotheksnamen (genau wie im Emby-Dashboard
+        /// unter "Bibliotheken" angezeigt), für die das Intro abgespielt werden soll.
+        /// Leer = Intro komplett deaktiviert, bis mindestens ein Name eingetragen wurde.
         /// </summary>
-        public string EnabledLibraryIds { get; set; } = string.Empty;
+        public string EnabledLibraryNames { get; set; } = string.Empty;
 
         /// <summary>
         /// Wenn true, wird das Intro auch vor Serienepisoden abgespielt.

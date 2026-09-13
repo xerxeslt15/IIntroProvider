@@ -24,7 +24,8 @@ kein Client-Trick, sondern serverseitig eingebaute Emby-Funktion.
 3. Emby Server neu starten.
 4. Im Dashboard unter **Plugins → DSK Intro Player**:
    - Pfad zur Intro-Datei eintragen (Server-Pfad, nicht der Windows/Client-Pfad).
-   - Bibliotheken auswählen, in denen das Intro laufen soll.
+   - Bibliotheken eintragen, in denen das Intro laufen soll: genaue Namen, durch Komma
+     getrennt, z. B. "Filme, Serien" (Groß-/Kleinschreibung egal).
    - Optional "auch vor Serienepisoden" aktivieren.
    - Speichern.
 

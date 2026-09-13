@@ -56,18 +56,18 @@ namespace DskIntroPlayer
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
 
-            var enabledIds = ParseEnabledLibraryIds(config.EnabledLibraryIds);
+            var enabledNames = ParseEnabledLibraryNames(config.EnabledLibraryNames);
 
-            // Solange keine Bibliothek ausgewählt wurde, bleibt das Intro komplett deaktiviert.
-            if (enabledIds.Count == 0)
+            // Solange keine Bibliothek eingetragen wurde, bleibt das Intro komplett deaktiviert.
+            if (enabledNames.Count == 0)
             {
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
 
             var topParent = item.GetTopParent();
-            var libraryId = topParent?.Id.ToString("N");
+            var libraryName = topParent?.Name;
 
-            if (string.IsNullOrEmpty(libraryId) || !enabledIds.Contains(libraryId))
+            if (string.IsNullOrEmpty(libraryName) || !enabledNames.Contains(libraryName))
             {
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
@@ -81,7 +81,7 @@ namespace DskIntroPlayer
             return Task.FromResult<IEnumerable<IntroInfo>>(new[] { intro });
         }
 
-        private static HashSet<string> ParseEnabledLibraryIds(string raw)
+        private static HashSet<string> ParseEnabledLibraryNames(string raw)
         {
             var parts = (raw ?? string.Empty)
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
