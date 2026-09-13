@@ -38,8 +38,7 @@ namespace DskIntroPlayer
                 new PluginPageInfo
                 {
                     Name = "DskIntroPlayer",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.configPage.html",
-                    EnableInMainMenu = true
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.configPage.html"
                 }
             };
         }
