@@ -2,8 +2,13 @@
 
 Emby-Server-Plugin, das ein eigenes Intro-Video vor Filmen (und optional
 Serienepisoden) in ausgewählten Bibliotheken abspielt. Nutzt Embys native
-`IIntroProvider`-Schnittstelle, die genau für Vorfilme/Pre-Rolls gedacht ist –
-kein Client-Trick, sondern serverseitig eingebaute Emby-Funktion.
+`IIntroProvider`-Schnittstelle, die genau für Vorfilme/Pre-Rolls gedacht ist.
+
+**Wichtig:** Dieses Plugin hat bewusst KEINE eigene Einstellungsseite im
+Emby-Dashboard, weil die aktuelle (Beta-)Version des Emby-Webclients beim
+Öffnen klassischer Plugin-Konfigurationsseiten abstürzt. Stattdessen wird
+die Konfiguration in einer einfachen Textdatei direkt auf dem Server
+bearbeitet.
 
 ## Build (über GitHub Actions)
 
@@ -15,30 +20,58 @@ kein Client-Trick, sondern serverseitig eingebaute Emby-Funktion.
 
 ## Installation auf dem Asustor-NAS
 
-1. `DskIntroPlayer.dll` in den Emby-Plugin-Ordner kopieren, z. B.:
-   `/usr/local/AppCentral/EmbyServer/var/plugins/`
-   (Pfad kann je nach Asustor-Setup leicht abweichen – im Zweifel im Emby-Dashboard
-   unter **Erweitert → Plugins** den tatsächlichen Plugin-Pfad prüfen.)
+1. `DskIntroPlayer.dll` in den Emby-Plugin-Ordner kopieren (z. B. den Pfad, den du
+   schon beim ersten Versuch verwendet hast).
 2. Deine Intro-Videodatei (z. B. `intro.mp4`) an einen Ort legen, den der Emby-Server-Prozess
-   lesen kann (z. B. neben deine Medienordner, oder ein eigener `Intro`-Ordner).
-3. Emby Server neu starten.
-4. Im Dashboard unter **Plugins → DSK Intro Player**:
-   - Pfad zur Intro-Datei eintragen (Server-Pfad, nicht der Windows/Client-Pfad).
-   - Bibliotheken eintragen, in denen das Intro laufen soll: genaue Namen, durch Komma
-     getrennt, z. B. "Filme, Serien" (Groß-/Kleinschreibung egal).
-   - Optional "auch vor Serienepisoden" aktivieren.
-   - Speichern.
+   lesen kann.
+3. Emby Server einmal neu starten. Dadurch legt Emby automatisch eine leere
+   Konfigurationsdatei für das Plugin an.
+
+## Konfiguration (per Datei, nicht per Weboberfläche)
+
+1. Im Emby-Dashboard unter **Dashboard → Erweitert → Konfigurationsdatei-Pfad**
+   nachsehen, wo dein Emby-Server-Datenordner liegt (oder im Dashboard unter
+   "Erweitert" den Punkt, der den Programmdaten-Pfad zeigt).
+2. Darin den Unterordner `plugins/configurations/` öffnen.
+3. Dort liegt jetzt eine Datei namens `DskIntroPlayer.xml`. Mit einem einfachen
+   Texteditor öffnen (z. B. Notepad, oder direkt über die Asustor-Weboberfläche).
+4. Der Inhalt sieht ungefähr so aus:
+
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <PluginConfiguration>
+     <IntroFilePath></IntroFilePath>
+     <EnabledLibraryNames></EnabledLibraryNames>
+     <IncludeEpisodes>false</IncludeEpisodes>
+   </PluginConfiguration>
+   ```
+
+5. Die Werte eintragen, zum Beispiel:
+
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <PluginConfiguration>
+     <IntroFilePath>/volume1/Media/Intro/intro.mp4</IntroFilePath>
+     <EnabledLibraryNames>Filme, Serien</EnabledLibraryNames>
+     <IncludeEpisodes>false</IncludeEpisodes>
+   </PluginConfiguration>
+   ```
+
+   - `IntroFilePath`: vollständiger Server-Pfad zu deiner Intro-Datei.
+   - `EnabledLibraryNames`: genaue Namen deiner Bibliotheken, durch Komma getrennt.
+     Leer lassen = Intro komplett deaktiviert.
+   - `IncludeEpisodes`: `true` oder `false` - ob das Intro auch vor Serienepisoden
+     laufen soll.
+
+6. Datei speichern, Emby Server neu starten, damit die Änderungen geladen werden.
 
 Danach spielt Emby das Intro automatisch vor jedem Start eines Films (bzw. einer
-Episode, falls aktiviert) in den ausgewählten Bibliotheken ab – bei jedem Client,
-der Embys Intro-Mechanismus unterstützt (Emby-Apps, Emby Theater, die meisten
-offiziellen Clients).
+Episode, falls aktiviert) in den ausgewählten Bibliotheken ab.
 
 ## Hinweise
 
-- Ohne ausgewählte Bibliothek bleibt das Intro komplett deaktiviert (Sicherheitsnetz
-  gegen versehentliches globales Abspielen).
+- Nach JEDER Änderung an der XML-Datei muss Emby Server neu gestartet werden -
+  die Datei wird nur beim Start eingelesen.
+- Ohne eingetragene Bibliothek bleibt das Intro komplett deaktiviert.
 - Existiert die eingetragene Datei nicht (mehr), wird einfach kein Intro eingespielt
   statt eines Fehlers.
-- Manche Drittclients (z. B. manche Kodi-Addons) ignorieren Embys Intro-Mechanismus –
-  das ist eine Client-Einschränkung, kein Plugin-Fehler.
