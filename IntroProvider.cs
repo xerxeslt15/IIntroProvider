@@ -83,11 +83,12 @@ namespace DskIntroPlayer
 
         private static HashSet<string> ParseEnabledLibraryIds(string raw)
         {
-            return (raw ?? string.Empty)
+            var parts = (raw ?? string.Empty)
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
-                .Where(s => s.Length > 0)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                .Where(s => s.Length > 0);
+
+            return new HashSet<string>(parts, StringComparer.OrdinalIgnoreCase);
         }
     }
 }
