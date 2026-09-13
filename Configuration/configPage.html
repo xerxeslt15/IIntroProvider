@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DSK Intro Player</title>
+</head>
+<body>
+    <div data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="DskIntroPlayerConfigForm">
+
+                    <div class="verticalSection">
+                        <h1>DSK Intro Player</h1>
+                        <p>Spielt ein eigenes Intro-Video vor Filmen (und optional Serienepisoden) in den ausgewählten Bibliotheken ab.</p>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="txtIntroFilePath">Pfad zur Intro-Videodatei (auf dem Server)</label>
+                        <input is="emby-input" type="text" id="txtIntroFilePath" name="txtIntroFilePath" />
+                        <div class="fieldDescription">
+                            Vollständiger Pfad auf dem Emby-Server, z. B. /volume1/Media/Intro/intro.mp4 (unter Windows z. B. C:\Intro\intro.mp4).
+                            Die Datei muss vom Emby-Server-Dienst lesbar sein.
+                        </div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" type="checkbox" id="chkIncludeEpisodes" />
+                            <span>Intro auch vor Serienepisoden abspielen</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Wenn deaktiviert, läuft das Intro nur vor Filmen.
+                        </div>
+                    </div>
+
+                    <div class="verticalSection">
+                        <h2>Bibliotheken</h2>
+                        <p>Wähle aus, in welchen Bibliotheken das Intro abgespielt werden soll. Ohne Auswahl bleibt das Intro deaktiviert.</p>
+                        <div id="libraryList"></div>
+                    </div>
+
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block">
+                            <span>Speichern</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var DskIntroPluginId = "7d3f6a1b-9c2e-4d5a-8b7f-1e2c3d4a5b6c";
+
+        function loadLibraries(page, enabledIds) {
+            ApiClient.getVirtualFolders().then(function (folders) {
+                var container = page.querySelector('#libraryList');
+                var html = '';
+
+                folders.forEach(function (folder) {
+                    var id = folder.ItemId;
+                    var checked = enabledIds.indexOf(id) !== -1 ? ' checked' : '';
+
+                    html += '<div class="checkboxContainer">';
+                    html += '<label>';
+                    html += '<input is="emby-checkbox" type="checkbox" class="chkLibrary" data-libraryid="' + id + '"' + checked + ' />';
+                    html += '<span>' + folder.Name + '</span>';
+                    html += '</label>';
+                    html += '</div>';
+                });
+
+                container.innerHTML = html || '<p>Keine Bibliotheken gefunden.</p>';
+            });
+        }
+
+        document.querySelector('.pluginConfigurationPage').addEventListener('pageshow', function () {
+            Dashboard.showLoadingMsg();
+            var page = this;
+
+            ApiClient.getPluginConfiguration(DskIntroPluginId).then(function (config) {
+                page.querySelector('#txtIntroFilePath').value = config.IntroFilePath || '';
+                page.querySelector('#chkIncludeEpisodes').checked = config.IncludeEpisodes || false;
+
+                var enabledIds = (config.EnabledLibraryIds || '')
+                    .split(',')
+                    .map(function (s) { return s.trim(); })
+                    .filter(function (s) { return s.length > 0; });
+
+                loadLibraries(page, enabledIds);
+
+                Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector('#DskIntroPlayerConfigForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var page = this.closest('.pluginConfigurationPage');
+            Dashboard.showLoadingMsg();
+
+            ApiClient.getPluginConfiguration(DskIntroPluginId).then(function (config) {
+                config.IntroFilePath = page.querySelector('#txtIntroFilePath').value;
+                config.IncludeEpisodes = page.querySelector('#chkIncludeEpisodes').checked;
+
+                var checkedBoxes = page.querySelectorAll('.chkLibrary:checked');
+                var ids = [];
+                checkedBoxes.forEach(function (box) {
+                    ids.push(box.getAttribute('data-libraryid'));
+                });
+                config.EnabledLibraryIds = ids.join(',');
+
+                ApiClient.updatePluginConfiguration(DskIntroPluginId, config).then(function (result) {
+                    Dashboard.processPluginConfigurationUpdateResult(result);
+                });
+            });
+
+            return false;
+        });
+    </script>
+</body>
+</html>
