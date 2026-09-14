@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PluginConfiguration>
-  <IntroFilePaths>/pfad/zu/intro1.mp4;/pfad/zu/intro2.mp4;/pfad/zu/intro3.mp4</IntroFilePaths>
-  <EnabledLibraryNames>Filme, Serien</EnabledLibraryNames>
-  <IncludeEpisodes>false</IncludeEpisodes>
-</PluginConfiguration>
