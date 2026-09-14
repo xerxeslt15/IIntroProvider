@@ -11,12 +11,15 @@ using MediaBrowser.Controller.Library;
 namespace DskIntroPlayer
 {
     /// <summary>
-    /// Stellt Emby das konfigurierte Intro-Video als Vorfilm ("Pre-Roll") zur Verfügung.
+    /// Stellt Emby ein konfiguriertes Intro-Video als Vorfilm ("Pre-Roll") zur Verfügung.
     /// Emby ruft GetIntros(...) automatisch vor jeder Wiedergabe eines passenden
-    /// Items auf und spielt die zurückgegebenen Pfade davor ab.
+    /// Items auf und spielt die zurückgegebenen Pfade davor ab. Sind mehrere
+    /// Intro-Dateien konfiguriert, wird bei jeder Wiedergabe zufällig eine davon gewählt.
     /// </summary>
     public class IntroProvider : IIntroProvider
     {
+        private static readonly Random Rng = new Random();
+
         public string Name => "DSK Intro Player";
 
         /// <summary>
@@ -24,11 +27,19 @@ namespace DskIntroPlayer
         /// </summary>
         public IEnumerable<string> GetAllIntroFiles()
         {
-            var path = Plugin.Instance?.Configuration.IntroFilePath;
+            var config = Plugin.Instance?.Configuration;
 
-            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            if (config == null)
             {
-                yield return path;
+                yield break;
+            }
+
+            foreach (var path in ParseIntroFilePaths(config.IntroFilePaths))
+            {
+                if (File.Exists(path))
+                {
+                    yield return path;
+                }
             }
         }
 
@@ -36,14 +47,8 @@ namespace DskIntroPlayer
         {
             var config = Plugin.Instance?.Configuration;
 
-            if (config == null || string.IsNullOrWhiteSpace(config.IntroFilePath))
+            if (config == null || string.IsNullOrWhiteSpace(config.IntroFilePaths))
             {
-                return Task.FromResult(Enumerable.Empty<IntroInfo>());
-            }
-
-            if (!File.Exists(config.IntroFilePath))
-            {
-                // Datei nicht (mehr) vorhanden -> kein Intro einspielen, statt einen Fehler zu werfen.
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
 
@@ -72,13 +77,35 @@ namespace DskIntroPlayer
                 return Task.FromResult(Enumerable.Empty<IntroInfo>());
             }
 
+            // Nur tatsächlich vorhandene Dateien berücksichtigen, statt bei einer
+            // fehlenden Datei direkt ganz auf das Intro zu verzichten.
+            var availablePaths = ParseIntroFilePaths(config.IntroFilePaths)
+                .Where(File.Exists)
+                .ToList();
+
+            if (availablePaths.Count == 0)
+            {
+                return Task.FromResult(Enumerable.Empty<IntroInfo>());
+            }
+
+            var chosenPath = availablePaths[Rng.Next(availablePaths.Count)];
+
             var intro = new IntroInfo
             {
                 ItemId = 0,
-                Path = config.IntroFilePath
+                Path = chosenPath
             };
 
             return Task.FromResult<IEnumerable<IntroInfo>>(new[] { intro });
+        }
+
+        private static List<string> ParseIntroFilePaths(string raw)
+        {
+            return (raw ?? string.Empty)
+                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .Where(s => s.Length > 0)
+                .ToList();
         }
 
         private static HashSet<string> ParseEnabledLibraryNames(string raw)

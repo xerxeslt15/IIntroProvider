@@ -40,7 +40,7 @@ bearbeitet.
    ```xml
    <?xml version="1.0" encoding="utf-8"?>
    <PluginConfiguration>
-     <IntroFilePath></IntroFilePath>
+     <IntroFilePaths></IntroFilePaths>
      <EnabledLibraryNames></EnabledLibraryNames>
      <IncludeEpisodes>false</IncludeEpisodes>
    </PluginConfiguration>
@@ -51,13 +51,13 @@ bearbeitet.
    ```xml
    <?xml version="1.0" encoding="utf-8"?>
    <PluginConfiguration>
-     <IntroFilePath>/volume1/Media/Intro/intro.mp4</IntroFilePath>
+     <IntroFilePaths>/volume1/Media/Intro/intro1.mp4;/volume1/Media/Intro/intro2.mp4</IntroFilePaths>
      <EnabledLibraryNames>Filme, Serien</EnabledLibraryNames>
      <IncludeEpisodes>false</IncludeEpisodes>
    </PluginConfiguration>
    ```
 
-   - `IntroFilePath`: vollständiger Server-Pfad zu deiner Intro-Datei.
+   - `IntroFilePaths`: ein oder mehrere vollständige Server-Pfade zu deinen Intro-Dateien, getrennt durch Semikolon (;). Bei mehreren wird bei jeder Wiedergabe zufällig eine ausgewählt.
    - `EnabledLibraryNames`: genaue Namen deiner Bibliotheken, durch Komma getrennt.
      Leer lassen = Intro komplett deaktiviert.
    - `IncludeEpisodes`: `true` oder `false` - ob das Intro auch vor Serienepisoden

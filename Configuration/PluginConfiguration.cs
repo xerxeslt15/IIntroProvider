@@ -8,10 +8,12 @@ namespace DskIntroPlayer.Configuration
     public class PluginConfiguration : BasePluginConfiguration
     {
         /// <summary>
-        /// Vollständiger Pfad zur Intro-Videodatei auf dem Emby-Server
-        /// (z. B. /volume1/Media/Intro/intro.mp4 oder C:\Intro\intro.mp4).
+        /// Ein oder mehrere Pfade zu Intro-Videodateien auf dem Emby-Server,
+        /// getrennt durch Semikolon (;), z. B.:
+        /// /volume1/Media/Intro/intro1.mp4;/volume1/Media/Intro/intro2.mp4
+        /// Bei mehreren Einträgen wird bei jeder Wiedergabe zufällig einer ausgewählt.
         /// </summary>
-        public string IntroFilePath { get; set; } = string.Empty;
+        public string IntroFilePaths { get; set; } = string.Empty;
 
         /// <summary>
         /// Kommagetrennte Liste der Bibliotheksnamen (genau wie im Emby-Dashboard
