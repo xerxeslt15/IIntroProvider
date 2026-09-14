@@ -23,11 +23,6 @@ namespace DskIntroPlayer
             Instance = this;
         }
 
-            // Erzwingt das Anlegen der Konfigurationsdatei auf der Festplatte
-            // direkt beim ersten Laden, statt erst beim ersten Speichervorgang.
-            SaveConfiguration();
-        }
-
         public static Plugin Instance { get; private set; }
 
         // Fest vergebene, eindeutige Plugin-Id - nicht mehr ändern.
